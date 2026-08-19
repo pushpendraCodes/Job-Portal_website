@@ -109,12 +109,12 @@ export function OtpStep({
         error={mobile.length === 10 && !mobileValid ? t("invalidMobile") : undefined}
         hint={t("mobileHint")}
       >
-        <div className="flex items-stretch gap-2">
-          <span className="flex items-center rounded-[12px] border border-line bg-mist px-3 text-sm font-semibold text-ink-soft">
+        <div className="flex min-w-0 items-stretch gap-2">
+          <span className="flex shrink-0 items-center rounded-[12px] border border-line bg-mist px-2.5 text-sm font-semibold text-ink-soft sm:px-3">
             +91
           </span>
           <input
-            className="input"
+            className="input min-w-0"
             inputMode="numeric"
             autoComplete="tel"
             placeholder="98765 43210"
@@ -163,7 +163,7 @@ export function OtpStep({
             {loading ? tc("loading") : t("verifyOtp")}
           </button>
 
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between">
             <button
               type="button"
               className="font-semibold text-ink-soft hover:text-ink"

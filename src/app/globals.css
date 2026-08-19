@@ -57,6 +57,7 @@ body {
   background: var(--paper);
   font-family: var(--font-body), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 h1,
@@ -80,8 +81,14 @@ a {
 /* ---------- layout ---------- */
 
 .container-x {
-  width: min(1180px, calc(100% - 2rem));
+  width: min(1180px, calc(100% - 1.25rem));
   margin-inline: auto;
+}
+
+@media (min-width: 640px) {
+  .container-x {
+    width: min(1180px, calc(100% - 2rem));
+  }
 }
 
 .section {
@@ -174,6 +181,14 @@ a {
     border-color 0.18s ease, color 0.18s ease;
   cursor: pointer;
   white-space: nowrap;
+  max-width: 100%;
+}
+
+@media (max-width: 639px) {
+  .btn {
+    white-space: normal;
+    text-align: center;
+  }
 }
 
 .btn:hover:not(:disabled) {
@@ -265,6 +280,8 @@ a {
 .select,
 .textarea {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   border: 1px solid var(--line);
   background: white;
   border-radius: var(--radius-sm);

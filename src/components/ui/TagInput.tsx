@@ -48,7 +48,7 @@ export function TagInput({
           </span>
         ))}
         <input
-          className="min-w-[9rem] flex-1 border-none bg-transparent px-1.5 py-1 text-sm outline-none placeholder:text-ink-mute"
+          className="min-w-0 flex-1 border-none bg-transparent px-1.5 py-1 text-sm outline-none placeholder:text-ink-mute sm:min-w-[9rem]"
           placeholder={value.length ? "" : placeholder}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}

@@ -40,21 +40,21 @@ function RegisterChooser() {
   ];
 
   return (
-    <div className="mesh-bg min-h-[80vh] py-12 sm:py-16">
-      <div className="container-x">
-        <div className="mx-auto max-w-2xl text-center">
+    <div className="mesh-bg min-h-[80vh] py-8 sm:py-12 lg:py-16">
+      <div className="container-x min-w-0">
+        <div className="mx-auto max-w-2xl px-1 text-center">
           <p className="eyebrow">{t("joinUs")}</p>
-          <h1 className="mt-2 font-display text-3xl text-ink sm:text-4xl">{t("chooseType")}</h1>
-          <p className="mt-3 text-ink-soft">{t("chooseTypeSub")}</p>
+          <h1 className="mt-2 font-display text-2xl text-ink sm:text-3xl lg:text-4xl">{t("chooseType")}</h1>
+          <p className="mt-3 text-sm text-ink-soft sm:text-base">{t("chooseTypeSub")}</p>
         </div>
 
-        <div className="mx-auto mt-10 grid max-w-4xl gap-5 md:grid-cols-2">
+        <div className="mx-auto mt-8 grid max-w-4xl gap-4 sm:mt-10 sm:gap-5 md:grid-cols-2">
           {cards.map((card) => (
-            <Link key={card.href} href={card.href} className="card card-hover flex flex-col p-7">
+            <Link key={card.href} href={card.href} className="card card-hover flex flex-col p-5 sm:p-7">
               <span className="flex h-12 w-12 items-center justify-center rounded-[14px] bg-accent-tint text-2xl">
                 {card.icon}
               </span>
-              <h2 className="mt-4 font-display text-2xl text-ink">{card.title}</h2>
+              <h2 className="mt-4 font-display text-xl text-ink sm:text-2xl">{card.title}</h2>
               <p className="mt-2 text-sm text-ink-soft">{card.body}</p>
 
               <ul className="mt-5 flex-1 space-y-2 text-sm text-ink-soft">

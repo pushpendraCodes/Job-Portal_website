@@ -99,7 +99,7 @@ export function SeekerEducationStep({
         <div className="space-y-4">
           {fields.map((field, index) => (
             <div key={field.id} className="card p-5">
-              <div className="mb-4 flex items-center justify-between">
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                 <span className="chip chip-accent">
                   {t("qualification")} {index + 1}
                 </span>
@@ -170,15 +170,15 @@ export function SeekerEducationStep({
         </div>
       )}
 
-      <div className="flex justify-between">
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
         {onBack ? (
-          <button type="button" className="btn btn-quiet" onClick={onBack}>
+          <button type="button" className="btn btn-quiet w-full sm:w-auto" onClick={onBack}>
             ← {tc("back")}
           </button>
         ) : (
-          <span />
+          <span className="hidden sm:block" />
         )}
-        <button type="submit" className="btn btn-primary" disabled={busy}>
+        <button type="submit" className="btn btn-primary w-full sm:w-auto" disabled={busy}>
           {busy ? tc("loading") : submitLabel ? submitLabel : `${tc("next")} →`}
         </button>
       </div>

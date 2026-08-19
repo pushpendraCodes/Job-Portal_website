@@ -42,11 +42,11 @@ export default function LoginClient() {
   };
 
   return (
-    <div className="mesh-bg flex min-h-[80vh] items-center py-12">
+    <div className="mesh-bg flex min-h-[80vh] items-center py-8 sm:py-12">
       <div className="container-x flex justify-center">
-        <div className="panel w-full max-w-md p-7 sm:p-9">
+        <div className="panel w-full max-w-md min-w-0 p-5 sm:p-7 lg:p-9">
           <p className="eyebrow">{t("welcomeBack")}</p>
-          <h1 className="mt-2 font-display text-3xl text-ink">{t("loginTitle")}</h1>
+          <h1 className="mt-2 font-display text-2xl text-ink sm:text-3xl">{t("loginTitle")}</h1>
           <p className="mt-2 text-sm text-ink-soft">{t("loginSub")}</p>
 
           <div className="mt-6 grid grid-cols-2 gap-1 rounded-full bg-mist p-1">
@@ -54,7 +54,7 @@ export default function LoginClient() {
               <button
                 key={type}
                 type="button"
-                className={`rounded-full px-3 py-2 text-sm font-semibold transition ${
+                className={`rounded-full px-2 py-2 text-xs font-semibold transition sm:px-3 sm:text-sm ${
                   accountType === type ? "bg-white text-ink shadow-sm" : "text-ink-soft"
                 }`}
                 onClick={() => setAccountType(type)}

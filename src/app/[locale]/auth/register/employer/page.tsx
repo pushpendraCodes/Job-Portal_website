@@ -111,14 +111,14 @@ export default function EmployerRegisterPage() {
   };
 
   return (
-    <div className="mesh-bg min-h-[80vh] py-10 sm:py-14">
-      <div className="container-x grid gap-8 lg:grid-cols-[1fr_360px]">
-        <div className="panel order-2 p-6 sm:p-8 lg:order-1">
+    <div className="mesh-bg min-h-[80vh] py-6 sm:py-10 lg:py-14">
+      <div className="container-x grid min-w-0 gap-5 sm:gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="panel min-w-0 p-4 sm:p-6 lg:p-8">
           <p className="eyebrow">{t("registerEmployer")}</p>
-          <h1 className="mt-2 font-display text-3xl text-ink">{te("heading")}</h1>
+          <h1 className="mt-2 font-display text-2xl text-ink sm:text-3xl">{te("heading")}</h1>
           <p className="mt-2 text-sm text-ink-soft">{te("subheading")}</p>
 
-          <div className="mt-6">
+          <div className="mt-5 sm:mt-6">
             <Stepper
               steps={steps}
               current={step}
@@ -126,7 +126,7 @@ export default function EmployerRegisterPage() {
             />
           </div>
 
-          <div className="mt-8">
+          <div className="mt-6 min-w-0 sm:mt-8">
             {step === 0 && (
               <OtpStep
                 accountType="employer"
@@ -248,8 +248,8 @@ export default function EmployerRegisterPage() {
                   />
                 </div>
 
-                <div className="flex justify-end">
-                  <button type="submit" className="btn btn-primary">
+                <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                  <button type="submit" className="btn btn-primary w-full sm:w-auto">
                     {tc("next")} →
                   </button>
                 </div>
@@ -367,11 +367,11 @@ export default function EmployerRegisterPage() {
                   />
                 </div>
 
-                <div className="flex justify-between">
-                  <button type="button" className="btn btn-quiet" onClick={() => setStep(1)}>
+                <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
+                  <button type="button" className="btn btn-quiet w-full sm:w-auto" onClick={() => setStep(1)}>
                     ← {tc("back")}
                   </button>
-                  <button type="submit" className="btn btn-primary">
+                  <button type="submit" className="btn btn-primary w-full sm:w-auto">
                     {tc("next")} →
                   </button>
                 </div>
@@ -402,11 +402,11 @@ export default function EmployerRegisterPage() {
 
                 {error && <Alert tone="error">{error}</Alert>}
 
-                <div className="flex justify-between">
-                  <button type="button" className="btn btn-quiet" onClick={() => setStep(2)}>
+                <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
+                  <button type="button" className="btn btn-quiet w-full sm:w-auto" onClick={() => setStep(2)}>
                     ← {tc("back")}
                   </button>
-                  <button type="submit" className="btn btn-primary" disabled={submitting}>
+                  <button type="submit" className="btn btn-primary w-full sm:w-auto" disabled={submitting}>
                     {submitting ? tc("loading") : t("complete")}
                   </button>
                 </div>
@@ -415,7 +415,7 @@ export default function EmployerRegisterPage() {
           </div>
         </div>
 
-        <aside className="order-1 h-fit lg:order-2 lg:sticky lg:top-24">
+        <aside className="hidden min-w-0 lg:block lg:sticky lg:top-24 lg:h-fit">
           <div className="weave-bg rounded-[16px] p-6 text-white">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/70">
               {te("benefitsTitle")}
