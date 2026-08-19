@@ -19,6 +19,8 @@ export function ApplicantProfileDrawer({
   locale,
   appliedAt,
   status,
+  eyebrow,
+  footer,
 }: {
   open: boolean;
   onClose: () => void;
@@ -29,6 +31,10 @@ export function ApplicantProfileDrawer({
   locale: string;
   appliedAt?: string;
   status?: string;
+  /** Overrides the "Applicant profile" label when browsing candidates who have not applied. */
+  eyebrow?: string;
+  /** Optional action bar pinned to the bottom of the drawer. */
+  footer?: React.ReactNode;
 }) {
   const t = useTranslations("employerDash");
   const tc = useTranslations("common");
@@ -59,7 +65,7 @@ export function ApplicantProfileDrawer({
       <aside className="relative z-10 flex h-full w-full max-w-xl flex-col overflow-hidden bg-white shadow-2xl animate-[fadeUp_0.25s_ease]">
         <div className="flex items-start justify-between gap-3 border-b border-line-soft px-5 py-4">
           <div className="min-w-0">
-            <p className="eyebrow">{t("applicantProfile")}</p>
+            <p className="eyebrow">{eyebrow ?? t("applicantProfile")}</p>
             <h2 className="mt-1 truncate font-display text-2xl text-ink">{profile.fullName}</h2>
             {profile.headline && (
               <p className="mt-1 text-sm text-ink-soft">{profile.headline}</p>
@@ -235,6 +241,10 @@ export function ApplicantProfileDrawer({
             </section>
           )}
         </div>
+
+        {footer && (
+          <div className="border-t border-line bg-white px-5 py-4">{footer}</div>
+        )}
       </aside>
     </div>
   );

@@ -23,6 +23,7 @@ const STATUS_TONE: Record<string, string> = {
 export default function EmployerHomePage() {
   const t = useTranslations("employerDash");
   const te = useTranslations("employer");
+  const tt = useTranslations("talent");
   const tc = useTranslations("common");
   const locale = useLocale();
   const router = useRouter();
@@ -113,6 +114,9 @@ export default function EmployerHomePage() {
             </div>
 
             <div className="flex flex-wrap gap-2">
+              <Link href="/employer/talent" className="btn btn-outline btn-sm">
+                🔎 {tt("findTalent")}
+              </Link>
               <Link href="/employer/profile" className="btn btn-outline btn-sm">
                 {t("editCompany")}
               </Link>
@@ -202,6 +206,22 @@ export default function EmployerHomePage() {
           </SectionCard>
 
           <div className="space-y-6">
+            <Link
+              href="/employer/talent"
+              className="card card-hover block p-5 transition hover:border-accent"
+            >
+              <div className="flex items-start gap-3">
+                <span className="text-3xl">🔎</span>
+                <div className="min-w-0">
+                  <p className="font-display text-lg text-ink">{tt("findTalent")}</p>
+                  <p className="mt-1 text-sm text-ink-soft">{tt("findTalentHint")}</p>
+                  <span className="mt-2 inline-block text-sm font-semibold text-accent">
+                    {tc("open")} →
+                  </span>
+                </div>
+              </div>
+            </Link>
+
             <SectionCard
               title={t("companyProfile")}
               action={
