@@ -5,10 +5,23 @@ export interface AuthUser {
   accountType: AccountType;
   mobile?: string;
   email?: string;
+  /** Display name from the seeker or employer profile, not stored on User. */
+  name?: string;
   status: string;
   preferredLocale?: "en" | "hi";
   isMpinSet?: boolean;
   registrationPending?: boolean;
+}
+
+/** Two-letter initials from a person's name, e.g. "Puneet Sharma" → "PS". */
+export function nameInitials(name?: string): string {
+  const parts = (name ?? "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (parts.length === 0) return "";
+  if (parts.length === 1) return parts[0]!.slice(0, 2).toUpperCase();
+  return `${parts[0]![0]}${parts[parts.length - 1]![0]}`.toUpperCase();
 }
 
 export interface EmployerProfile {

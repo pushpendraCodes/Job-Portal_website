@@ -7,6 +7,7 @@ import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout } from "@/store/authSlice";
 import { api } from "@/lib/api";
+import { nameInitials } from "@/lib/types";
 
 const LOCALES = ["en", "hi"] as const;
 
@@ -96,7 +97,11 @@ export function Header() {
   ];
 
   const dashboardHref = user?.accountType === "employer" ? "/employer" : "/seeker";
-  const initial = (user?.email || user?.mobile || "?").trim().charAt(0).toUpperCase();
+  const displayName = user?.name?.trim() || "";
+  const firstName = displayName.split(/\s+/)[0] || t("nav.account");
+  const initial =
+    nameInitials(displayName) ||
+    (user?.email || user?.mobile || "?").trim().slice(0, 2).toUpperCase();
 
   return (
     <>
@@ -181,10 +186,10 @@ export function Header() {
                       : "border-line bg-white text-ink hover:border-accent",
                   )}
                 >
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent font-display text-white">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent font-display text-xs text-white">
                     {initial}
                   </span>
-                  <span className="hidden lg:inline">{t("nav.account")}</span>
+                  <span className="hidden max-w-[9rem] truncate lg:inline">{firstName}</span>
                   <span className={clsx("text-xs transition", accountOpen && "rotate-180")}>▾</span>
                 </button>
 
@@ -193,9 +198,12 @@ export function Header() {
                     role="menu"
                     className="menu-pop absolute right-0 mt-2 w-56 overflow-hidden rounded-[14px] border border-line bg-white p-1.5 shadow-lg"
                   >
-                    <p className="truncate px-3 pb-2 pt-1.5 text-xs text-ink-mute">
-                      {user.email || user.mobile}
-                    </p>
+                    <div className="px-3 pb-2 pt-1.5">
+                      {displayName && (
+                        <p className="truncate text-sm font-semibold text-ink">{displayName}</p>
+                      )}
+                      <p className="truncate text-xs text-ink-mute">{user.email || user.mobile}</p>
+                    </div>
                     <Link
                       href={dashboardHref}
                       role="menuitem"

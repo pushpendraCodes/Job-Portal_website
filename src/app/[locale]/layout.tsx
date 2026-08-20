@@ -1,4 +1,4 @@
-import { Fraunces, Manrope } from "next/font/google";
+import { Noto_Serif, Noto_Serif_Devanagari } from "next/font/google";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
@@ -9,16 +9,18 @@ import { Footer } from "@/components/Footer";
 import { PushRegistrar } from "@/components/PushRegistrar";
 import "../globals.css";
 
-const display = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-display",
-  weight: ["500", "600", "700"],
+const notoSerif = Noto_Serif({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-noto",
+  display: "swap",
 });
 
-const body = Manrope({
-  subsets: ["latin"],
-  variable: "--font-body",
+const notoSerifDevanagari = Noto_Serif_Devanagari({
+  subsets: ["devanagari"],
   weight: ["400", "500", "600", "700"],
+  variable: "--font-noto-devanagari",
+  display: "swap",
 });
 
 export function generateStaticParams() {
@@ -58,7 +60,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale}>
-      <body className={`${display.variable} ${body.variable} antialiased`}>
+      <body className={`${notoSerif.variable} ${notoSerifDevanagari.variable} antialiased`}>
         <NextIntlClientProvider messages={messages}>
           <StoreProvider>
             <PushRegistrar />

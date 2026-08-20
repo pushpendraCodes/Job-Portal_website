@@ -39,8 +39,8 @@
   --color-warm: var(--warm);
   --color-danger: var(--danger);
   --color-success: var(--success);
-  --font-display: var(--font-display);
-  --font-sans: var(--font-body);
+  --font-display: var(--font-noto), var(--font-noto-devanagari);
+  --font-sans: var(--font-noto), var(--font-noto-devanagari);
 }
 
 * {
@@ -55,7 +55,7 @@ body {
   margin: 0;
   color: var(--ink);
   background: var(--paper);
-  font-family: var(--font-body), system-ui, sans-serif;
+  font-family: var(--font-noto), var(--font-noto-devanagari), "Noto Serif", Georgia, serif;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
@@ -64,7 +64,7 @@ h1,
 h2,
 h3,
 .font-display {
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-noto), var(--font-noto-devanagari), "Noto Serif", Georgia, serif;
   letter-spacing: -0.02em;
 }
 
