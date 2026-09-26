@@ -33,7 +33,7 @@ export function TagInput({
 
   return (
     <div>
-      <div className="flex flex-wrap items-center gap-2 rounded-[12px] border border-line bg-white p-2 focus-within:border-accent focus-within:shadow-[0_0_0_3px_var(--accent-soft)]">
+      <div className="flex flex-wrap items-center gap-2 rounded-[12px] border border-line bg-surface p-2 focus-within:border-accent focus-within:shadow-[0_0_0_3px_var(--accent-soft)]">
         {value.map((tag) => (
           <span key={tag} className="chip chip-accent">
             {tag}

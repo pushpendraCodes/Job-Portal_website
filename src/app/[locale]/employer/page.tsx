@@ -31,6 +31,12 @@ export default function EmployerHomePage() {
 
   const [jobs, setJobs] = useState<Job[]>([]);
   const [profile, setProfile] = useState<EmployerProfile | null>(null);
+  const [stats, setStats] = useState({
+    totalJobs: 0,
+    activeJobs: 0,
+    applications: 0,
+    views: 0,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -39,10 +45,22 @@ export default function EmployerHomePage() {
   const load = useCallback(async () => {
     try {
       const [jobsRes, profileRes] = await Promise.all([
-        api.get<ApiSuccess<Job[]>>("/jobs/mine", { params: { limit: 50 } }),
+        api.get<ApiSuccess<Job[]>>("/jobs/mine", {
+          params: { limit: 8, sortBy: "createdAt", sortOrder: "desc" },
+        }),
         api.get<ApiSuccess<{ profile: EmployerProfile }>>("/profile/me"),
       ]);
-      setJobs(jobsRes.data.data);
+      const listed = jobsRes.data.data;
+      const meta = jobsRes.data.meta;
+      setJobs(listed);
+      setStats({
+        totalJobs: meta?.totalJobs ?? meta?.total ?? listed.length,
+        activeJobs: meta?.activeJobs ?? listed.filter((job) => job.status === "published").length,
+        applications:
+          meta?.totalApplications ??
+          listed.reduce((sum, job) => sum + (job.applicationsCount ?? 0), 0),
+        views: meta?.totalViews ?? listed.reduce((sum, job) => sum + (job.viewsCount ?? 0), 0),
+      });
       setProfile(profileRes.data.data.profile);
     } catch (err) {
       setError(getErrorMessage(err));
@@ -64,9 +82,6 @@ export default function EmployerHomePage() {
     void load();
   }, [hydrated, user, router, load]);
 
-  const activeJobs = jobs.filter((job) => job.status === "published").length;
-  const applications = jobs.reduce((sum, job) => sum + (job.applicationsCount ?? 0), 0);
-  const views = jobs.reduce((sum, job) => sum + (job.viewsCount ?? 0), 0);
   const completeness = employerCompleteness(profile);
 
   if (loading) {
@@ -135,14 +150,14 @@ export default function EmployerHomePage() {
           </div>
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatTile label={t("totalJobs")} value={jobs.length} tone="accent" />
-            <StatTile label={t("activeJobs")} value={activeJobs} />
-            <StatTile label={t("applications")} value={applications} />
-            <StatTile label={t("views")} value={views} />
+            <StatTile label={t("totalJobs")} value={stats.totalJobs} tone="accent" />
+            <StatTile label={t("activeJobs")} value={stats.activeJobs} />
+            <StatTile label={t("applications")} value={stats.applications} />
+            <StatTile label={t("views")} value={stats.views} />
           </div>
 
           {completeness < 100 && (
-            <div className="mt-5 rounded-[14px] border border-line bg-white p-4">
+            <div className="mt-5 rounded-[14px] border border-line bg-surface p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold text-ink">{t("completeCompany")}</p>
                 <Link

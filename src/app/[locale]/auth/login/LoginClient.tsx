@@ -55,7 +55,7 @@ export default function LoginClient() {
                 key={type}
                 type="button"
                 className={`rounded-full px-2 py-2 text-xs font-semibold transition sm:px-3 sm:text-sm ${
-                  accountType === type ? "bg-white text-ink shadow-sm" : "text-ink-soft"
+                  accountType === type ? "bg-surface text-ink shadow-sm" : "text-ink-soft"
                 }`}
                 onClick={() => setAccountType(type)}
               >

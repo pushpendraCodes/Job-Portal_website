@@ -35,7 +35,7 @@ export default async function CategoriesPage({
       <div className="container-x">
         <div className="max-w-2xl">
           <p className="eyebrow">{t("categoriesPage.eyebrow")}</p>
-          <h1 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
+          <h1 className="mt-2 font-display text-[1.75rem] leading-[1.15] tracking-[-0.022em] text-ink sm:text-[2rem]">
             {t("categoriesPage.title")}
           </h1>
           <p className="mt-2 text-ink-soft">{t("categoriesPage.subtitle")}</p>
@@ -44,7 +44,7 @@ export default async function CategoriesPage({
         {categories.length === 0 ? (
           <div className="mt-10">
             <EmptyState
-              icon="🧵"
+              icon="◇"
               title={t("categoriesPage.empty")}
               description={t("categoriesPage.emptyHint")}
               action={
@@ -59,7 +59,7 @@ export default async function CategoriesPage({
             {categories.map((category, index) => (
               <article
                 key={category._id}
-                className="overflow-hidden rounded-[16px] border border-line bg-white shadow-sm"
+                className="card overflow-hidden"
               >
                 <Link
                   href={`/jobs?categoryId=${category._id}`}

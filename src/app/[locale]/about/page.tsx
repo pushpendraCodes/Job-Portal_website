@@ -36,13 +36,11 @@ export default async function AboutPage({
 
   return (
     <>
-      <section className="weave-bg py-16 text-white sm:py-20">
+      <section className="page-hero py-16 sm:py-20">
         <div className="container-x max-w-3xl">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/70">
-            {t("nav.about")}
-          </p>
-          <h1 className="mt-3 font-display text-3xl sm:text-5xl">{title}</h1>
-          <p className="mt-4 whitespace-pre-wrap text-lg leading-relaxed text-white/80">{body}</p>
+          <p className="eyebrow">{t("nav.about")}</p>
+          <h1 className="mt-3 font-display text-[1.75rem] leading-[1.15] tracking-[-0.022em] text-ink sm:text-[2.125rem]">{title}</h1>
+          <p className="mt-4 whitespace-pre-wrap text-lg leading-relaxed text-ink-soft">{body}</p>
         </div>
       </section>
 
@@ -59,7 +57,7 @@ export default async function AboutPage({
           ))}
         </div>
 
-        <div className="mt-12 rounded-[20px] border border-line bg-white p-8 text-center shadow-sm">
+        <div className="mt-12 rounded-[12px] border border-line bg-surface p-8 text-center">
           <h2 className="font-display text-2xl text-ink">{t("about.ctaTitle")}</h2>
           <p className="mx-auto mt-2 max-w-xl text-ink-soft">{t("about.ctaSub")}</p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">

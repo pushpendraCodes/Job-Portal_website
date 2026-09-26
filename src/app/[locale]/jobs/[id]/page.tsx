@@ -238,7 +238,7 @@ export default function JobDetailPage() {
 
                     <button
                       type="button"
-                      className="btn btn-primary mt-4 w-full"
+                      className="btn btn-primary mt-4 hidden w-full lg:inline-flex"
                       disabled={applying}
                       onClick={() => void apply()}
                     >
@@ -284,6 +284,19 @@ export default function JobDetailPage() {
           </aside>
         </div>
       </div>
+
+      {showApplySection && !applied && (
+        <div className="fixed inset-x-0 bottom-16 z-30 border-t border-line bg-surface p-3 lg:hidden">
+          <button
+            type="button"
+            className="btn btn-primary w-full"
+            disabled={applying}
+            onClick={() => void apply()}
+          >
+            {applying ? t("common.loading") : tj("apply")}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -86,7 +86,7 @@ export default function SeekerDashboardPage() {
         <section className="panel overflow-hidden">
           <div className="weave-bg h-20 sm:h-24" />
 
-          <div className="relative bg-white px-6 pb-6 sm:px-8">
+          <div className="relative bg-surface px-6 pb-6 sm:px-8">
             {/* Avatar overlaps banner edge only — name stays on white below */}
             <div className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1/2 sm:left-8 sm:translate-x-0">
               <div className="h-24 w-24 overflow-hidden rounded-full border-4 border-white bg-mist shadow-md">
@@ -139,7 +139,7 @@ export default function SeekerDashboardPage() {
             </div>
 
             {completeness < 100 && (
-              <div className="mt-5 rounded-[14px] border border-line bg-white p-4">
+              <div className="mt-5 rounded-[14px] border border-line bg-surface p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-semibold text-ink">{t("completeProfile")}</p>
                   <Link

@@ -62,7 +62,7 @@ export function ApplicantProfileDrawer({
         className="absolute inset-0 bg-ink/40 backdrop-blur-[2px]"
         onClick={onClose}
       />
-      <aside className="relative z-10 flex h-full w-full max-w-xl flex-col overflow-hidden bg-white shadow-2xl animate-[fadeUp_0.25s_ease]">
+      <aside className="relative z-10 flex h-full w-full max-w-xl flex-col overflow-hidden bg-surface shadow-2xl animate-[fadeUp_0.25s_ease]">
         <div className="flex items-start justify-between gap-3 border-b border-line-soft px-5 py-4">
           <div className="min-w-0">
             <p className="eyebrow">{eyebrow ?? t("applicantProfile")}</p>
@@ -243,7 +243,7 @@ export function ApplicantProfileDrawer({
         </div>
 
         {footer && (
-          <div className="border-t border-line bg-white px-5 py-4">{footer}</div>
+          <div className="border-t border-line bg-surface px-5 py-4">{footer}</div>
         )}
       </aside>
     </div>

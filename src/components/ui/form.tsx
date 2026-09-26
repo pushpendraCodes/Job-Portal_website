@@ -95,7 +95,7 @@ export function CheckboxRow({
   ...props
 }: { label: string; description?: string } & InputHTMLAttributes<HTMLInputElement>) {
   return (
-    <label className="flex cursor-pointer items-start gap-3 rounded-[12px] border border-line bg-white p-3.5 transition hover:border-accent/50">
+    <label className="flex cursor-pointer items-start gap-3 rounded-[12px] border border-line bg-surface p-3.5 transition hover:border-accent/50">
       <input
         type="checkbox"
         className="mt-0.5 h-4 w-4 accent-[var(--accent)]"

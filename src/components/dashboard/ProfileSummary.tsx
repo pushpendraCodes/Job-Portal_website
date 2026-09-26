@@ -27,7 +27,7 @@ export function ExperienceList({
       {items.map((item, index) => (
         <div key={item._id ?? index} className="flex gap-4">
           <div className="flex w-3 shrink-0 flex-col items-center pt-1.5">
-            <span className="h-3 w-3 shrink-0 rounded-full border-[3px] border-accent bg-white" />
+            <span className="h-3 w-3 shrink-0 rounded-full border-[3px] border-accent bg-surface" />
             {index < items.length - 1 && (
               <span aria-hidden className="my-1 w-0.5 flex-1 min-h-6 bg-line" />
             )}
@@ -58,7 +58,7 @@ export function EducationList({ items }: { items: EducationEntry[] }) {
       {items.map((item, index) => (
         <div key={item._id ?? index} className="flex gap-4">
           <div className="flex w-3 shrink-0 flex-col items-center pt-1.5">
-            <span className="h-3 w-3 shrink-0 rounded-full border-[3px] border-accent bg-white" />
+            <span className="h-3 w-3 shrink-0 rounded-full border-[3px] border-accent bg-surface" />
             {index < items.length - 1 && (
               <span aria-hidden className="my-1 w-0.5 flex-1 min-h-6 bg-line" />
             )}
@@ -115,7 +115,7 @@ export function StatTile({
   return (
     <div
       className={`rounded-[14px] border p-4 ${
-        tone === "accent" ? "border-accent/20 bg-accent-tint" : "border-line bg-white"
+        tone === "accent" ? "border-accent/20 bg-accent-tint" : "border-line bg-surface"
       }`}
     >
       <p className="font-display text-2xl text-ink">{value}</p>

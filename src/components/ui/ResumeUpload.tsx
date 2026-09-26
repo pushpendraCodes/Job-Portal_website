@@ -58,7 +58,7 @@ export function ResumeUpload({
           void handle(e.dataTransfer.files?.[0]);
         }}
         className={`rounded-[14px] border border-dashed px-5 py-6 text-center transition ${
-          dragging ? "border-accent bg-accent-tint" : "border-line bg-white"
+          dragging ? "border-accent bg-accent-tint" : "border-line bg-surface"
         }`}
       >
         <input

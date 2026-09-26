@@ -11,7 +11,7 @@ import { JobListItem } from "@/components/JobListItem";
 import { Alert } from "@/components/ui/Alert";
 import { JobCardSkeleton } from "@/components/ui/Skeleton";
 import { EMPLOYMENT_TYPES, optionLabel } from "@/lib/formOptions";
-import { POPULAR_CITIES, SALARY_STEPS, categoryIcon } from "@/lib/jobBrowse";
+import { POPULAR_CITIES, SALARY_STEPS } from "@/lib/jobBrowse";
 
 const PAGE_SIZE = 10;
 const TRADES_COLLAPSED = 8;
@@ -113,24 +113,34 @@ interface SpeechRecognitionLike {
   start: () => void;
 }
 
-/** Section wrapper that numbers each choice so the page reads as a simple sequence. */
-function Step({
-  title,
+function GroupLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-mute">
+      {children}
+    </h3>
+  );
+}
+
+function FilterOption({
+  active,
+  onClick,
   children,
-  action,
 }: {
-  title: string;
+  active: boolean;
+  onClick: () => void;
   children: React.ReactNode;
-  action?: React.ReactNode;
 }) {
   return (
-    <section className="mt-6">
-      <div className="flex items-baseline justify-between gap-3">
-        <h2 className="font-display text-base text-ink sm:text-lg">{title}</h2>
-        {action}
-      </div>
-      <div className="mt-3">{children}</div>
-    </section>
+    <button
+      type="button"
+      className={`filter-check ${active ? "filter-check-on" : ""}`}
+      onClick={onClick}
+    >
+      <span className="filter-dot" aria-hidden="true">
+        {active ? "✓" : ""}
+      </span>
+      <span className="min-w-0 truncate">{children}</span>
+    </button>
   );
 }
 
@@ -161,6 +171,7 @@ function JobsBrowser() {
   const [showCityInput, setShowCityInput] = useState(
     !!filters.city && !POPULAR_CITIES.includes(filters.city),
   );
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const selectedCategory = useMemo(
     () => categories.find((c) => c._id === filters.categoryId),
@@ -218,11 +229,11 @@ function JobsBrowser() {
   const visibleTrades = showAllTrades ? categories : categories.slice(0, TRADES_COLLAPSED);
 
   const chosen: Array<{ key: keyof Filters; label: string; clear: Partial<Filters> }> = [];
-  if (filters.q) chosen.push({ key: "q", label: `🔎 ${filters.q}`, clear: { q: "" } });
+  if (filters.q) chosen.push({ key: "q", label: filters.q, clear: { q: "" } });
   if (selectedCategory) {
     chosen.push({
       key: "categoryId",
-      label: `${categoryIcon(selectedCategory.slug)} ${categoryName(selectedCategory, locale)}`,
+      label: categoryName(selectedCategory, locale),
       clear: { categoryId: "", subcategoryId: "" },
     });
   }
@@ -233,11 +244,11 @@ function JobsBrowser() {
       clear: { subcategoryId: "" },
     });
   }
-  if (filters.city) chosen.push({ key: "city", label: `📍 ${filters.city}`, clear: { city: "" } });
+  if (filters.city) chosen.push({ key: "city", label: filters.city, clear: { city: "" } });
   if (filters.salaryMin) {
     chosen.push({
       key: "salaryMin",
-      label: `💰 ₹${Number(filters.salaryMin).toLocaleString("en-IN")}+`,
+      label: `₹${Number(filters.salaryMin).toLocaleString("en-IN")}+`,
       clear: { salaryMin: "" },
     });
   }
@@ -245,7 +256,7 @@ function JobsBrowser() {
     const option = EMPLOYMENT_TYPES.find((o) => o.value === filters.employmentType);
     chosen.push({
       key: "employmentType",
-      label: `⏰ ${option ? optionLabel(option, locale) : filters.employmentType}`,
+      label: option ? optionLabel(option, locale) : filters.employmentType,
       clear: { employmentType: "" },
     });
   }
@@ -263,305 +274,311 @@ function JobsBrowser() {
     resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  return (
-    <div className="mesh-bg min-h-[80vh] pb-12">
-      <div className="container-x">
-        {/* Search: speak or type */}
-        <div className="pt-7 sm:pt-9">
-          <h1 className="font-display text-2xl text-ink sm:text-3xl">{t("jobs.findWork")}</h1>
-          <p className="mt-1 text-sm text-ink-soft sm:text-base">{t("jobs.findWorkSub")}</p>
+  const filterPanel = (
+    <aside className="jobs-filters">
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-sm font-semibold text-ink">{t("jobs.filters")}</h2>
+        {chosen.length > 0 && (
+          <button type="button" className="text-xs font-semibold text-accent" onClick={clearAll}>
+            {t("jobs.clear")}
+          </button>
+        )}
+      </div>
 
-          <form
-            className="mt-4 flex flex-wrap items-center gap-2"
-            onSubmit={(e) => {
-              e.preventDefault();
-              patch({ q: qDraft.trim() });
+      <div className="jobs-filter-group">
+        <div className="flex items-center justify-between gap-2">
+          <GroupLabel>{t("jobs.step1")}</GroupLabel>
+          {categories.length > TRADES_COLLAPSED && (
+            <button
+              type="button"
+              className="text-[11px] font-semibold text-accent"
+              onClick={() => setShowAllTrades((v) => !v)}
+            >
+              {showAllTrades ? t("jobs.showLess") : t("jobs.showMore")}
+            </button>
+          )}
+        </div>
+        <FilterOption
+          active={!filters.categoryId}
+          onClick={() => patch({ categoryId: "", subcategoryId: "" })}
+        >
+          {t("jobs.anyTrade")}
+        </FilterOption>
+        {visibleTrades.map((category) => (
+          <FilterOption
+            key={category._id}
+            active={filters.categoryId === category._id}
+            onClick={() => patch({ categoryId: category._id, subcategoryId: "" })}
+          >
+            {categoryName(category, locale)}
+          </FilterOption>
+        ))}
+      </div>
+
+      {subcategories.length > 0 && (
+        <div className="jobs-filter-group">
+          <GroupLabel>{t("jobs.subcategory")}</GroupLabel>
+          <FilterOption active={!filters.subcategoryId} onClick={() => patch({ subcategoryId: "" })}>
+            {t("jobs.allSubcategories")}
+          </FilterOption>
+          {subcategories.map((sub) => (
+            <FilterOption
+              key={sub._id}
+              active={filters.subcategoryId === sub._id}
+              onClick={() => patch({ subcategoryId: sub._id })}
+            >
+              {categoryName(sub, locale)}
+            </FilterOption>
+          ))}
+        </div>
+      )}
+
+      <div className="jobs-filter-group">
+        <GroupLabel>{t("jobs.step2")}</GroupLabel>
+        <FilterOption
+          active={!filters.city}
+          onClick={() => {
+            setShowCityInput(false);
+            patch({ city: "" });
+          }}
+        >
+          {t("jobs.anyCity")}
+        </FilterOption>
+        {POPULAR_CITIES.map((city) => (
+          <FilterOption
+            key={city}
+            active={filters.city === city}
+            onClick={() => {
+              setShowCityInput(false);
+              patch({ city });
             }}
           >
-            <input
-              className="input h-11 flex-1 text-base"
-              placeholder={t("jobs.searchSimple")}
-              value={qDraft}
-              onChange={(e) => setQDraft(e.target.value)}
-              aria-label={t("jobs.searchSimple")}
-            />
-            <VoiceButton
-              locale={locale}
-              label={t("jobs.speak")}
-              listeningLabel={t("jobs.listening")}
-              unsupportedMessage={t("jobs.voiceUnsupported")}
-              onResult={(text) => {
-                setQDraft(text);
-                patch({ q: text });
-              }}
-            />
-            <button type="submit" className="btn btn-primary h-11 px-6">
-              {t("jobs.searchCta")}
-            </button>
-          </form>
-        </div>
-
-        {/* 1. Trade */}
-        <Step
-          title={t("jobs.step1")}
-          action={
-            categories.length > TRADES_COLLAPSED ? (
-              <button
-                type="button"
-                className="text-sm font-semibold text-accent"
-                onClick={() => setShowAllTrades((v) => !v)}
-              >
-                {showAllTrades ? t("jobs.showLess") : t("jobs.showMore")}
-              </button>
-            ) : undefined
-          }
+            {city}
+          </FilterOption>
+        ))}
+        <FilterOption
+          active={showCityInput}
+          onClick={() => setShowCityInput((v) => !v)}
         >
-          <div className="scroll-x-hide -mx-1 flex flex-wrap gap-2 overflow-x-auto px-1 pb-1">
-            <button
-              type="button"
-              className={`trade-tile ${!filters.categoryId ? "trade-tile-active" : ""}`}
-              onClick={() => patch({ categoryId: "", subcategoryId: "" })}
-            >
-              <span className="trade-tile-emoji">🗂️</span>
-              <span>{t("jobs.anyTrade")}</span>
-            </button>
-            {visibleTrades.map((category) => (
-              <button
-                key={category._id}
-                type="button"
-                className={`trade-tile ${
-                  filters.categoryId === category._id ? "trade-tile-active" : ""
-                }`}
-                onClick={() => patch({ categoryId: category._id, subcategoryId: "" })}
-              >
-                <span className="trade-tile-emoji">{categoryIcon(category.slug)}</span>
-                <span>{categoryName(category, locale)}</span>
-              </button>
-            ))}
-          </div>
+          {t("jobs.otherCity")}
+        </FilterOption>
+        {showCityInput && (
+          <input
+            className="input mt-2 h-9 text-sm"
+            placeholder={t("jobs.cityPlaceholder")}
+            defaultValue={POPULAR_CITIES.includes(filters.city) ? "" : filters.city}
+            onChange={(e) => patch({ city: e.target.value.trim() })}
+            aria-label={t("auth.city")}
+          />
+        )}
+      </div>
 
-          {subcategories.length > 0 && (
-            <div className="scroll-x-hide mt-3 flex gap-2 overflow-x-auto pb-1">
+      <div className="jobs-filter-group">
+        <GroupLabel>{t("jobs.step3")}</GroupLabel>
+        <FilterOption active={!filters.salaryMin} onClick={() => patch({ salaryMin: "" })}>
+          {t("jobs.anySalary")}
+        </FilterOption>
+        {SALARY_STEPS.map((step) => (
+          <FilterOption
+            key={step.value}
+            active={filters.salaryMin === step.value}
+            onClick={() => patch({ salaryMin: step.value })}
+          >
+            {optionLabel(step, locale)}
+          </FilterOption>
+        ))}
+      </div>
+
+      <div className="jobs-filter-group">
+        <GroupLabel>{t("jobs.step4")}</GroupLabel>
+        <FilterOption
+          active={!filters.employmentType}
+          onClick={() => patch({ employmentType: "" })}
+        >
+          {t("jobs.anyType")}
+        </FilterOption>
+        {EMPLOYMENT_TYPES.map((option) => (
+          <FilterOption
+            key={option.value}
+            active={filters.employmentType === option.value}
+            onClick={() => patch({ employmentType: option.value })}
+          >
+            {optionLabel(option, locale)}
+          </FilterOption>
+        ))}
+      </div>
+    </aside>
+  );
+
+  return (
+    <div className="min-h-[70vh] bg-paper pb-10">
+      <div className="container-x pt-5 sm:pt-7">
+        <div className="jobs-layout">
+          <div className="hidden lg:block lg:sticky lg:top-24">{filterPanel}</div>
+
+          <div ref={resultsRef} className="min-w-0">
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <h1 className="font-display text-2xl text-ink sm:text-[1.75rem]">{t("jobs.findWork")}</h1>
+                <p className="mt-1 text-sm text-ink-soft">{t("jobs.findWorkSub")}</p>
+              </div>
               <button
                 type="button"
-                className={`pick ${!filters.subcategoryId ? "pick-active" : ""}`}
-                onClick={() => patch({ subcategoryId: "" })}
+                className="btn btn-outline btn-sm lg:hidden"
+                onClick={() => setMobileFiltersOpen(true)}
               >
-                {t("jobs.allSubcategories")}
+                {t("jobs.filters")}
+                {chosen.length > 0 ? ` (${chosen.length})` : ""}
               </button>
-              {subcategories.map((sub) => (
-                <button
-                  key={sub._id}
-                  type="button"
-                  className={`pick ${filters.subcategoryId === sub._id ? "pick-active" : ""}`}
-                  onClick={() => patch({ subcategoryId: sub._id })}
-                >
-                  {categoryName(sub, locale)}
-                </button>
-              ))}
             </div>
-          )}
-        </Step>
 
-        {/* 2. City */}
-        <Step title={t("jobs.step2")}>
-          <div className="scroll-x-hide flex flex-wrap gap-2 pb-1">
-            <button
-              type="button"
-              className={`pick ${!filters.city ? "pick-active" : ""}`}
-              onClick={() => {
-                setShowCityInput(false);
-                patch({ city: "" });
-              }}
-            >
-              🌐 {t("jobs.anyCity")}
-            </button>
-            {POPULAR_CITIES.map((city) => (
-              <button
-                key={city}
-                type="button"
-                className={`pick ${filters.city === city ? "pick-active" : ""}`}
-                onClick={() => {
-                  setShowCityInput(false);
-                  patch({ city });
-                }}
-              >
-                📍 {city}
-              </button>
-            ))}
-            <button
-              type="button"
-              className={`pick ${showCityInput ? "pick-active" : ""}`}
-              onClick={() => setShowCityInput((v) => !v)}
-            >
-              ✏️ {t("jobs.otherCity")}
-            </button>
-          </div>
-
-          {showCityInput && (
             <form
-              className="mt-3 flex max-w-sm gap-2"
+              className="mt-4 flex flex-wrap items-center gap-2"
               onSubmit={(e) => {
                 e.preventDefault();
+                patch({ q: qDraft.trim() });
               }}
             >
               <input
-                className="input h-11 text-base"
-                placeholder={t("jobs.cityPlaceholder")}
-                defaultValue={POPULAR_CITIES.includes(filters.city) ? "" : filters.city}
-                onChange={(e) => patch({ city: e.target.value.trim() })}
-                aria-label={t("auth.city")}
+                className="input h-11 flex-1 text-sm"
+                placeholder={t("jobs.searchSimple")}
+                value={qDraft}
+                onChange={(e) => setQDraft(e.target.value)}
+                aria-label={t("jobs.searchSimple")}
               />
-            </form>
-          )}
-        </Step>
-
-        {/* 3. Salary */}
-        <Step title={t("jobs.step3")}>
-          <div className="scroll-x-hide flex flex-wrap gap-2 pb-1">
-            <button
-              type="button"
-              className={`pick ${!filters.salaryMin ? "pick-active" : ""}`}
-              onClick={() => patch({ salaryMin: "" })}
-            >
-              {t("jobs.anySalary")}
-            </button>
-            {SALARY_STEPS.map((step) => (
-              <button
-                key={step.value}
-                type="button"
-                className={`pick ${filters.salaryMin === step.value ? "pick-active" : ""}`}
-                onClick={() => patch({ salaryMin: step.value })}
-              >
-                💰 {optionLabel(step, locale)}
-              </button>
-            ))}
-          </div>
-        </Step>
-
-        {/* 4. Job type */}
-        <Step title={t("jobs.step4")}>
-          <div className="scroll-x-hide flex flex-wrap gap-2 pb-1">
-            <button
-              type="button"
-              className={`pick ${!filters.employmentType ? "pick-active" : ""}`}
-              onClick={() => patch({ employmentType: "" })}
-            >
-              {t("jobs.anyType")}
-            </button>
-            {EMPLOYMENT_TYPES.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                className={`pick ${
-                  filters.employmentType === option.value ? "pick-active" : ""
-                }`}
-                onClick={() => patch({ employmentType: option.value })}
-              >
-                ⏰ {optionLabel(option, locale)}
-              </button>
-            ))}
-          </div>
-        </Step>
-
-        {/* Choices made so far */}
-        {chosen.length > 0 && (
-          <div className="mt-6 flex flex-wrap items-center gap-2">
-            <span className="text-sm font-semibold text-ink-soft">{t("jobs.yourChoice")}:</span>
-            {chosen.map((item) => (
-              <button
-                key={item.key}
-                type="button"
-                className="pick-tag"
-                onClick={() => {
-                  if (item.key === "q") setQDraft("");
-                  patch(item.clear);
+              <VoiceButton
+                locale={locale}
+                label={t("jobs.speak")}
+                listeningLabel={t("jobs.listening")}
+                unsupportedMessage={t("jobs.voiceUnsupported")}
+                onResult={(text) => {
+                  setQDraft(text);
+                  patch({ q: text });
                 }}
-              >
-                {item.label}
-                <span className="pick-tag-x" aria-hidden="true">
-                  ✕
-                </span>
+              />
+              <button type="submit" className="btn btn-primary h-11 px-5 text-sm">
+                {t("jobs.searchCta")}
               </button>
-            ))}
-            <button type="button" className="btn btn-outline btn-sm" onClick={clearAll}>
-              {t("jobs.clear")}
-            </button>
-          </div>
-        )}
+            </form>
 
-        {/* Results */}
-        <div ref={resultsRef} className="mt-7 scroll-mt-24">
-          <p className="font-display text-lg text-ink sm:text-xl">
-            {loading ? t("common.loading") : t("jobs.jobsFound", { count: total })}
-          </p>
-
-          {error && (
-            <Alert tone="error" className="mt-3">
-              {error}
-            </Alert>
-          )}
-
-          {loading ? (
-            <div className="mt-4 grid gap-3">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <JobCardSkeleton key={index} />
-              ))}
-            </div>
-          ) : jobs.length === 0 ? (
-            <div className="mt-4 rounded-[16px] border border-dashed border-line bg-white/70 px-6 py-12 text-center">
-              <div className="text-4xl">🔍</div>
-              <h3 className="mt-3 font-display text-xl text-ink">{t("jobs.noJobsSimple")}</h3>
-              <p className="mx-auto mt-2 max-w-sm text-sm text-ink-soft">
-                {t("jobs.noJobsSimpleHint")}
-              </p>
-              {chosen.length > 0 && (
-                <button type="button" className="btn btn-primary mt-5" onClick={clearAll}>
-                  {t("jobs.removeFilters")}
+            {chosen.length > 0 && (
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                {chosen.map((item) => (
+                  <button
+                    key={item.key}
+                    type="button"
+                    className="pick-tag pick-tag-sm"
+                    onClick={() => {
+                      if (item.key === "q") setQDraft("");
+                      patch(item.clear);
+                    }}
+                  >
+                    {item.label}
+                    <span className="pick-tag-x" aria-hidden="true">
+                      ✕
+                    </span>
+                  </button>
+                ))}
+                <button type="button" className="text-xs font-semibold text-accent" onClick={clearAll}>
+                  {t("jobs.clear")}
                 </button>
-              )}
-            </div>
-          ) : (
-            <>
-              <div className="mt-4 grid gap-3">
-                {jobs.map((job) => (
-                  <JobListItem key={job._id} job={job} locale={locale} />
+              </div>
+            )}
+
+            <p className="mt-5 text-sm font-semibold text-ink">
+              {loading ? t("common.loading") : t("jobs.jobsFound", { count: total })}
+            </p>
+
+            {error && (
+              <Alert tone="error" className="mt-3">
+                {error}
+              </Alert>
+            )}
+
+            {loading ? (
+              <div className="mt-3 grid gap-3">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <JobCardSkeleton key={index} />
                 ))}
               </div>
-
-              {totalPages > 1 && (
-                <div className="mt-8 flex items-center justify-between gap-3">
-                  <button
-                    type="button"
-                    className="btn btn-outline"
-                    disabled={page <= 1}
-                    onClick={() => goToPage(page - 1)}
-                  >
-                    ← {t("common.previous")}
+            ) : jobs.length === 0 ? (
+              <div className="mt-3 rounded-[12px] border border-dashed border-line bg-surface px-6 py-12 text-center">
+                <h3 className="font-display text-lg text-ink">{t("jobs.noJobsSimple")}</h3>
+                <p className="mx-auto mt-1 max-w-sm text-sm text-ink-soft">
+                  {t("jobs.noJobsSimpleHint")}
+                </p>
+                {chosen.length > 0 && (
+                  <button type="button" className="btn btn-primary mt-4 btn-sm" onClick={clearAll}>
+                    {t("jobs.removeFilters")}
                   </button>
-                  <span className="text-sm font-semibold text-ink-soft">
-                    {t("jobs.pageOf", { page, total: totalPages })}
-                  </span>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    disabled={page >= totalPages}
-                    onClick={() => goToPage(page + 1)}
-                  >
-                    {t("common.next")} →
-                  </button>
+                )}
+              </div>
+            ) : (
+              <>
+                <div className="mt-3 grid gap-3">
+                  {jobs.map((job) => (
+                    <JobListItem key={job._id} job={job} locale={locale} />
+                  ))}
                 </div>
-              )}
-            </>
-          )}
-        </div>
 
-        <div className="mt-10 text-center">
-          <Link href="/auth/register/seeker" className="btn btn-dark">
-            {t("auth.iAmSeeker")}
-          </Link>
+                {totalPages > 1 && (
+                  <div className="mt-6 flex items-center justify-between gap-3">
+                    <button
+                      type="button"
+                      className="btn btn-outline btn-sm"
+                      disabled={page <= 1}
+                      onClick={() => goToPage(page - 1)}
+                    >
+                      ← {t("common.previous")}
+                    </button>
+                    <span className="text-xs font-semibold text-ink-soft">
+                      {t("jobs.pageOf", { page, total: totalPages })}
+                    </span>
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      disabled={page >= totalPages}
+                      onClick={() => goToPage(page + 1)}
+                    >
+                      {t("common.next")} →
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+
+            <div className="mt-8 text-center">
+              <Link href="/auth/register/seeker" className="btn btn-outline btn-sm">
+                {t("auth.iAmSeeker")}
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
+
+      {mobileFiltersOpen && (
+        <div className="lg:hidden">
+          <button
+            type="button"
+            aria-label={t("nav.close")}
+            className="sheet-backdrop"
+            onClick={() => setMobileFiltersOpen(false)}
+          />
+          <div className="sheet">
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-sm font-semibold text-ink">{t("jobs.filters")}</span>
+              <button
+                type="button"
+                className="text-sm font-semibold text-accent"
+                onClick={() => setMobileFiltersOpen(false)}
+              >
+                {t("nav.close")}
+              </button>
+            </div>
+            {filterPanel}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -570,7 +587,7 @@ export default function JobsPage() {
   return (
     <Suspense
       fallback={
-        <div className="container-x grid gap-4 py-10">
+        <div className="container-x grid gap-3 py-8">
           <JobCardSkeleton />
           <JobCardSkeleton />
         </div>

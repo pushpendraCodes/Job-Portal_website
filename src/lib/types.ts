@@ -223,6 +223,18 @@ export function profileCompleteness(profile: JobSeekerProfile | null): number {
   return Math.round((checks.filter(Boolean).length / checks.length) * 100);
 }
 
+export interface CmsBanner {
+  _id: string;
+  titleEn: string;
+  titleHi: string;
+  imageUrl: string;
+  linkUrl?: string;
+  placement: string;
+  isActive: boolean;
+  startsAt?: string;
+  endsAt?: string;
+}
+
 export function employerCompleteness(profile: EmployerProfile | null): number {
   if (!profile) return 0;
   const checks = [

@@ -1,4 +1,4 @@
-import { Noto_Serif, Noto_Serif_Devanagari } from "next/font/google";
+import { Noto_Sans_Devanagari } from "next/font/google";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
@@ -9,17 +9,10 @@ import { Footer } from "@/components/Footer";
 import { PushRegistrar } from "@/components/PushRegistrar";
 import "../globals.css";
 
-const notoSerif = Noto_Serif({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-noto",
-  display: "swap",
-});
-
-const notoSerifDevanagari = Noto_Serif_Devanagari({
+const notoDevanagari = Noto_Sans_Devanagari({
   subsets: ["devanagari"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-noto-devanagari",
+  variable: "--font-devanagari",
   display: "swap",
 });
 
@@ -60,12 +53,12 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale}>
-      <body className={`${notoSerif.variable} ${notoSerifDevanagari.variable} antialiased`}>
+      <body className={`${notoDevanagari.variable} antialiased`}>
         <NextIntlClientProvider messages={messages}>
           <StoreProvider>
             <PushRegistrar />
             <Header />
-            <main className="min-h-[70vh]">{children}</main>
+            <main className="min-h-[70vh] pb-24 lg:pb-8">{children}</main>
             <Footer />
           </StoreProvider>
         </NextIntlClientProvider>

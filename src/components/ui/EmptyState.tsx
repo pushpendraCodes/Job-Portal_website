@@ -12,8 +12,8 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-[16px] border border-dashed border-line bg-white/60 px-6 py-14 text-center">
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-mist text-xl text-ink-soft">
+    <div className="flex flex-col items-center justify-center rounded-[12px] border border-dashed border-line bg-surface px-6 py-14 text-center">
+      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-mist text-xl text-ink-soft" aria-hidden="true">
         {icon}
       </div>
       <h3 className="mt-4 font-display text-xl text-ink">{title}</h3>

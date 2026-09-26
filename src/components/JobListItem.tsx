@@ -1,8 +1,9 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { EmployerProfile, Job, JobCategory } from "@/lib/types";
-import { companyName, jobTitle } from "@/lib/types";
-import { categoryIcon, shortSalary } from "@/lib/jobBrowse";
+import { categoryName, companyName, jobTitle } from "@/lib/types";
+import { shortSalary } from "@/lib/jobBrowse";
+import { CategoryMark, IconClock, IconPin, IconRupee } from "@/components/ui/Icons";
 import { EMPLOYMENT_TYPES, optionLabel } from "@/lib/formOptions";
 
 const NEW_FOR_DAYS = 7;
@@ -24,6 +25,15 @@ function timeAgo(days: number, locale: string): string {
   return `${Math.floor(days / 30)} months ago`;
 }
 
+function experienceText(job: Job, yearsLabel: string, fresherLabel: string) {
+  if (job.experienceMin == null && job.experienceMax == null) return fresherLabel;
+  if ((job.experienceMin ?? 0) === 0 && (job.experienceMax ?? 0) === 0) return fresherLabel;
+  const min = job.experienceMin ?? 0;
+  const max = job.experienceMax;
+  if (max != null && max !== min) return `${min}-${max} ${yearsLabel}`;
+  return `${min}+ ${yearsLabel}`;
+}
+
 export function JobListItem({ job, locale }: { job: Job; locale: string }) {
   const t = useTranslations();
 
@@ -38,56 +48,63 @@ export function JobListItem({ job, locale }: { job: Job; locale: string }) {
   const salary = shortSalary(job);
   const age = daysOld(job.publishedAt || job.createdAt);
   const employmentType = EMPLOYMENT_TYPES.find((o) => o.value === job.employmentType);
+  const experience = experienceText(job, t("jobs.years"), t("jobs.fresherOk"));
 
   return (
-    <Link href={`/jobs/${job._id}`} className="card card-hover group block p-4 sm:p-5">
-      <div className="flex items-start gap-3">
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-[14px] border border-line bg-mist text-2xl">
+    <Link href={`/jobs/${job._id}`} className="job-row group">
+      <div className="flex items-start gap-4">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="job-row-title">{jobTitle(job, locale)}</h3>
+            {age <= NEW_FOR_DAYS && <span className="badge badge-success">{t("jobs.newJob")}</span>}
+          </div>
+          {company && <p className="mt-1 truncate text-[0.92rem] text-ink-soft">{company}</p>}
+
+          <div className="job-row-meta mt-3">
+            <span>
+              <IconClock className="h-3.5 w-3.5" />
+              {experience}
+            </span>
+            <span>
+              <IconRupee className="h-3.5 w-3.5" />
+              {salary || t("jobs.salaryOnTalk")}
+            </span>
+            <span>
+              <IconPin className="h-3.5 w-3.5" />
+              {job.city}
+            </span>
+            {employmentType && (
+              <span>
+                <IconClock className="h-3.5 w-3.5" />
+                {optionLabel(employmentType, locale)}
+              </span>
+            )}
+          </div>
+
+          {(job.skills?.length > 0 || category) && (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {category && <span className="chip">{categoryName(category, locale)}</span>}
+              {job.skills.slice(0, 4).map((skill) => (
+                <span key={skill} className="chip">
+                  {skill}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <span className="text-xs text-ink-mute">{timeAgo(age, locale)}</span>
+            <span className="text-sm font-semibold text-accent">{t("jobs.viewJob")}</span>
+          </div>
+        </div>
+
+        <div className="job-row-logo">
           {employer?.logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={employer.logoUrl} alt={company} className="h-full w-full object-cover" />
           ) : (
-            <span>{categoryIcon(category?.slug)}</span>
+            <CategoryMark label={jobTitle(job, locale)} />
           )}
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-start gap-x-2 gap-y-1">
-            <h3 className="font-display text-lg leading-snug text-ink transition group-hover:text-accent sm:text-xl">
-              {jobTitle(job, locale)}
-            </h3>
-            {age <= NEW_FOR_DAYS && (
-              <span className="badge badge-success mt-1">{t("jobs.newJob")}</span>
-            )}
-          </div>
-
-          {company && (
-            <p className="mt-0.5 truncate text-sm font-medium text-ink-soft">{company}</p>
-          )}
-
-          <p className="mt-2 font-display text-xl text-accent-deep sm:text-2xl">
-            {salary ? (
-              <>
-                {salary}{" "}
-                <span className="text-sm font-medium text-ink-soft">{t("jobs.perMonth")}</span>
-              </>
-            ) : (
-              <span className="text-base font-medium text-ink-soft">{t("jobs.salaryOnTalk")}</span>
-            )}
-          </p>
-
-          <div className="mt-2.5 flex flex-wrap gap-2">
-            <span className="chip">📍 {job.city}</span>
-            {job.vacancies > 0 && (
-              <span className="chip">👥 {t("jobs.openings", { count: job.vacancies })}</span>
-            )}
-            {employmentType && <span className="chip">⏰ {optionLabel(employmentType, locale)}</span>}
-          </div>
-
-          <div className="mt-3 flex items-center justify-between gap-3 border-t border-line-soft pt-2.5">
-            <span className="text-xs text-ink-mute">{timeAgo(age, locale)}</span>
-            <span className="text-sm font-semibold text-accent">{t("jobs.viewJob")} →</span>
-          </div>
         </div>
       </div>
     </Link>

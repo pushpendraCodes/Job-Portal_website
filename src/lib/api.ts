@@ -96,6 +96,10 @@ export type ApiSuccess<T> = {
     page: number;
     limit: number;
     totalPages: number;
+    totalApplications?: number;
+    totalJobs?: number;
+    activeJobs?: number;
+    totalViews?: number;
   };
 };
 

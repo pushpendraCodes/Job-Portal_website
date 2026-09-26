@@ -5,7 +5,7 @@ export function Footer() {
   const t = useTranslations();
 
   return (
-    <footer className="mt-20 border-t border-line bg-white">
+    <footer className="mt-16 border-t border-line bg-surface">
       <div className="container-x grid gap-10 py-14 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
         <div>
           <div className="font-display text-2xl text-ink">{t("brand")}</div>
@@ -15,10 +15,10 @@ export function Footer() {
         <div className="text-sm">
           <div className="mb-3 font-semibold text-ink">{t("footer.explore")}</div>
           <div className="flex flex-col gap-2.5 text-ink-soft">
-            <Link href="/jobs" className="hover:text-accent">
+            <Link href="/jobs" className="transition-colors duration-200 hover:text-accent">
               {t("nav.jobs")}
             </Link>
-            <Link href="/about" className="hover:text-accent">
+            <Link href="/about" className="transition-colors duration-200 hover:text-accent">
               {t("nav.about")}
             </Link>
           </div>
@@ -27,10 +27,10 @@ export function Footer() {
         <div className="text-sm">
           <div className="mb-3 font-semibold text-ink">{t("footer.jobSeekers")}</div>
           <div className="flex flex-col gap-2.5 text-ink-soft">
-            <Link href="/auth/register/seeker" className="hover:text-accent">
+            <Link href="/auth/register/seeker" className="transition-colors duration-200 hover:text-accent">
               {t("auth.registerSeeker")}
             </Link>
-            <Link href="/auth/login?type=job_seeker" className="hover:text-accent">
+            <Link href="/auth/login?type=job_seeker" className="transition-colors duration-200 hover:text-accent">
               {t("nav.login")}
             </Link>
           </div>
@@ -39,10 +39,10 @@ export function Footer() {
         <div className="text-sm">
           <div className="mb-3 font-semibold text-ink">{t("footer.employers")}</div>
           <div className="flex flex-col gap-2.5 text-ink-soft">
-            <Link href="/auth/register/employer" className="hover:text-accent">
+            <Link href="/auth/register/employer" className="transition-colors duration-200 hover:text-accent">
               {t("auth.registerEmployer")}
             </Link>
-            <Link href="/auth/login?type=employer" className="hover:text-accent">
+            <Link href="/auth/login?type=employer" className="transition-colors duration-200 hover:text-accent">
               {t("nav.login")}
             </Link>
           </div>

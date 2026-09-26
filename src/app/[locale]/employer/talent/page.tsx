@@ -164,7 +164,11 @@ export default function EmployerTalentPage() {
     setDetailLoading(true);
     setError("");
     try {
-      const { data } = await api.get<ApiSuccess<CandidateDetail>>(`/talent/${candidate.userId}`);
+      const seekerUserId =
+        typeof candidate.userId === "object" && candidate.userId
+          ? String((candidate.userId as { _id?: string })._id ?? candidate.userId)
+          : String(candidate.userId);
+      const { data } = await api.get<ApiSuccess<CandidateDetail>>(`/talent/${seekerUserId}`);
       setDetail(data.data);
     } catch (err) {
       setError(getErrorMessage(err));
@@ -546,7 +550,7 @@ function FilterPill({
       className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
         active
           ? "border-accent bg-accent text-white"
-          : "border-line bg-white text-ink-soft hover:border-accent"
+          : "border-line bg-surface text-ink-soft hover:border-accent"
       }`}
     >
       {label}

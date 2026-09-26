@@ -19,7 +19,7 @@ interface Applicant {
   resumeUrl?: string;
   createdAt: string;
   seekerProfileId?: JobSeekerProfile;
-  seekerId?: { mobile?: string; email?: string };
+  seekerId?: { _id?: string; mobile?: string; email?: string };
 }
 
 const STATUS_TONE: Record<string, string> = {
@@ -31,17 +31,21 @@ const STATUS_TONE: Record<string, string> = {
 };
 
 const FILTERS = ["all", "published", "pending_approval", "draft", "closed"] as const;
+const PAGE_SIZE = 8;
 
 export default function EmployerJobsPage() {
   const t = useTranslations("employerDash");
   const te = useTranslations("employer");
   const tc = useTranslations("common");
+  const tj = useTranslations("jobs");
   const locale = useLocale();
   const router = useRouter();
   const { user, hydrated } = useAppSelector((s) => s.auth);
 
   const [jobs, setJobs] = useState<Job[]>([]);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -54,15 +58,22 @@ export default function EmployerJobsPage() {
   const load = useCallback(async () => {
     try {
       const { data } = await api.get<ApiSuccess<Job[]>>("/jobs/mine", {
-        params: { limit: 100 },
+        params: {
+          page,
+          limit: PAGE_SIZE,
+          sortBy: "createdAt",
+          sortOrder: "desc",
+          ...(filter !== "all" ? { status: filter } : {}),
+        },
       });
       setJobs(data.data);
+      setTotal(data.meta?.total ?? data.data.length);
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [page, filter]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -86,11 +97,22 @@ export default function EmployerJobsPage() {
     try {
       const { data } = await api.get<ApiSuccess<Applicant[]>>(`/jobs/${jobId}/applications`);
       setApplicants(data.data);
+      setJobs((prev) =>
+        prev.map((job) =>
+          job._id === jobId ? { ...job, applicationsCount: data.data.length } : job,
+        ),
+      );
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {
       setApplicantsLoading(false);
     }
+  };
+
+  const openApplicantProfile = (applicant: Applicant) => {
+    setSelectedApplicant(applicant);
+    if (!openJobId) return;
+    void api.get(`/jobs/${openJobId}/applications/${applicant._id}`).catch(() => undefined);
   };
 
   const closeJob = async (jobId: string) => {
@@ -100,10 +122,8 @@ export default function EmployerJobsPage() {
     setSuccess("");
     try {
       await api.post(`/jobs/${jobId}/close`);
-      setJobs((prev) =>
-        prev.map((job) => (job._id === jobId ? { ...job, status: "closed" } : job)),
-      );
       setSuccess(t("closeJobSuccess"));
+      await load();
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {
@@ -111,7 +131,11 @@ export default function EmployerJobsPage() {
     }
   };
 
-  const visible = filter === "all" ? jobs : jobs.filter((job) => job.status === filter);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const goToPage = (next: number) => {
+    setPage(next);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <div className="mesh-bg min-h-[80vh] py-8 sm:py-10">
@@ -136,11 +160,15 @@ export default function EmployerJobsPage() {
             <button
               key={item}
               type="button"
-              onClick={() => setFilter(item)}
+              onClick={() => {
+                setFilter(item);
+                setPage(1);
+                setLoading(true);
+              }}
               className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-semibold transition ${
                 filter === item
                   ? "bg-ink text-white"
-                  : "border border-line bg-white text-ink-soft hover:border-accent"
+                  : "border border-line bg-surface text-ink-soft hover:border-accent"
               }`}
             >
               {item === "all" ? tc("all") : t(`status.${item}`)}
@@ -154,7 +182,7 @@ export default function EmployerJobsPage() {
         <div className="mt-6 space-y-4">
           {loading ? (
             Array.from({ length: 3 }).map((_, index) => <JobCardSkeleton key={index} />)
-          ) : visible.length === 0 ? (
+          ) : jobs.length === 0 ? (
             <EmptyState
               icon="📋"
               title={t("noJobs")}
@@ -166,7 +194,7 @@ export default function EmployerJobsPage() {
               }
             />
           ) : (
-            visible.map((job) => (
+            jobs.map((job) => (
               <div key={job._id} className="card p-5">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0">
@@ -262,7 +290,7 @@ export default function EmployerJobsPage() {
                                 <button
                                   type="button"
                                   className="btn btn-primary btn-sm h-fit"
-                                  onClick={() => setSelectedApplicant(applicant)}
+                                  onClick={() => openApplicantProfile(applicant)}
                                 >
                                   {t("viewProfile")}
                                 </button>
@@ -288,6 +316,30 @@ export default function EmployerJobsPage() {
             ))
           )}
         </div>
+
+        {!loading && totalPages > 1 && (
+          <div className="mt-6 flex items-center justify-between gap-3">
+            <button
+              type="button"
+              className="btn btn-outline btn-sm"
+              disabled={page <= 1}
+              onClick={() => goToPage(page - 1)}
+            >
+              ← {tc("previous")}
+            </button>
+            <span className="text-xs font-semibold text-ink-soft">
+              {tj("pageOf", { page, total: totalPages })}
+            </span>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              disabled={page >= totalPages}
+              onClick={() => goToPage(page + 1)}
+            >
+              {tc("next")} →
+            </button>
+          </div>
+        )}
       </div>
 
       <ApplicantProfileDrawer
